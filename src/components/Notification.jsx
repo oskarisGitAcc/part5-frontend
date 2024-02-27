@@ -4,11 +4,11 @@ const Notification = ({ message, type }) => {
   }
 
   const notificationStyle = {
-    color: type === "success" ? "green" : "red",
+    color: type === 'success' ? 'green' : 'red',
   }
 
   return (
-    <div className="notification" style={notificationStyle}>
+    <div className='notification' style={notificationStyle}>
       {message}
     </div>
   )
