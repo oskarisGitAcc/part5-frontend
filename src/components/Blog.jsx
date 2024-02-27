@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLike }) => {
   const [showDetails, setShowDetails] = useState(false)
 
   const toggleDetails = () => {
@@ -15,6 +15,11 @@ const Blog = ({ blog }) => {
     marginBottom: 5
   }
 
+  const handleSubmitLike = async (event) => {
+    event.preventDefault()
+    handleLike(blog.id)
+  }
+
   return (
     <div style={blogStyle}>
       <div>
@@ -26,9 +31,9 @@ const Blog = ({ blog }) => {
       {showDetails && (
         <div>
           <div>{blog.url}</div>
-          <div>
-            Likes: {blog.likes} <button>Like</button>
-          </div>
+          <form onSubmit={handleSubmitLike}>
+            Likes: {blog.likes} <button type="submit">Like</button>
+          </form>
           <div>{blog.user.name}</div>
         </div>
       )}

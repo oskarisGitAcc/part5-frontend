@@ -60,6 +60,18 @@ const App = () => {
     setUser(null)
   }
 
+  const handleLike = async (id) => {
+    try {
+      const blogToUpdate = blogs.find(blog => blog.id === id)
+      const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 }
+      await blogService.update(id, updatedBlog)
+      setBlogs(blogs.map(blog => (blog.id === id ? updatedBlog : blog)))
+      handleNotification('Liked the blog', 'success')
+    } catch (exception) {
+      handleNotification('Failed to like the blog', 'error')
+    }
+  }
+
   const addBlog = async (newBlog) => {
     try {
       const createdBlog = await blogService.create(newBlog)
@@ -107,7 +119,7 @@ const App = () => {
             <BlogForm addBlog={addBlog} />
           </Togglable>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog} handleLike={handleLike} />
           )}
         </div>
       }
