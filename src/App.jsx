@@ -7,10 +7,10 @@ import loginService from './services/login'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
-  const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [notification, setNotification] = useState({ message: '', type: '' })
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -27,6 +27,13 @@ const App = () => {
     )
   }, [])
 
+  const handleNotification = (message, type) => {
+    setNotification({message: message, type: type})
+    setTimeout(() => {
+      setNotification({message: '', type: ''})
+    }, 5000)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -42,10 +49,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      handleNotification('Wrong credentials', 'error')
     }
   }
 
@@ -66,11 +70,9 @@ const App = () => {
       const createdBlog = await blogService.create(newBlog)
       setBlogs(blogs.concat(createdBlog))
       setNewBlog({ title: '', author: '', url: '' })
+      handleNotification('Blog added successfully', 'success')
     } catch (exception) {
-      setErrorMessage('Failed to add new blog')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      handleNotification('Failed to add new blog', 'error')
     }
   }
 
@@ -144,7 +146,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={errorMessage} />
+      <Notification message={notification.message} type={notification.type} />
       {user === null ? loginForm() : blogForm()}
     </div>
   )
