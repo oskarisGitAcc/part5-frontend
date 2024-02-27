@@ -24,9 +24,10 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    blogService.getAll().then(blogs => {
+      const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
+      setBlogs(sortedBlogs)
+    })
   }, [])
 
   const handleNotification = (message, type) => {
@@ -65,7 +66,9 @@ const App = () => {
       const blogToUpdate = blogs.find(blog => blog.id === id)
       const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 }
       await blogService.update(id, updatedBlog)
-      setBlogs(blogs.map(blog => (blog.id === id ? updatedBlog : blog)))
+      const updatedBlogs = blogs.map(blog => (blog.id === id ? updatedBlog : blog))
+      const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes)
+      setBlogs(sortedBlogs)
       handleNotification('Liked the blog', 'success')
     } catch (exception) {
       handleNotification('Failed to like the blog', 'error')
