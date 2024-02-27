@@ -75,6 +75,17 @@ const App = () => {
     }
   }
 
+  const handleDelete = async id => {
+    try {
+      await blogService.remove(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      handleNotification('Blog deleted successfully', 'success')
+    } catch (error) {
+      console.error('Error deleting blog:', error.message)
+      handleNotification('Failed to delete blog', 'error')
+    }
+  }
+
   const addBlog = async (newBlog) => {
     try {
       const createdBlog = await blogService.create(newBlog)
@@ -122,7 +133,13 @@ const App = () => {
             <BlogForm addBlog={addBlog} />
           </Togglable>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} handleLike={handleLike} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              handleLike={handleLike}
+              handleDelete={handleDelete}
+              user={user}
+            />
           )}
         </div>
       }
