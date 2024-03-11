@@ -36,4 +36,22 @@ describe('Blog component', () => {
     expect(url).toBeNull()
     expect(likes).toBeNull()
   })
+
+  test('after clicking the details button, url&likes are displayed', async () => {
+    let url = screen.queryByText('http://example.com')
+    let likes = screen.queryByText('Likes: 10')
+
+    expect(url).toBeNull()
+    expect(likes).toBeNull()
+
+    const user = userEvent.setup()
+    const button = screen.getByText('View')
+    await user.click(button)
+
+    url = screen.queryByText('http://example.com')
+    likes = screen.queryByText('Likes: 10')
+
+    expect(url).toBeDefined()
+    expect(likes).toBeDefined()
+  })
 })
