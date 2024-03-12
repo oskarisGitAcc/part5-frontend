@@ -3,9 +3,9 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
+import BlogForm from './BlogForm'
 
 describe('Blog component', () => {
-  let container
   const blog = {
     title: 'Test Blog',
     author: 'Test Author',
@@ -15,13 +15,13 @@ describe('Blog component', () => {
   }
 
   beforeEach(() => {
-    container = render(
+    render(
       <Blog
         blog={blog}
         handleLike={() => {}}
         handleDelete={() => {}}
         user={{}} />
-    ).container
+    )
   })
 
   test('renders title and author by default', () => {
@@ -43,9 +43,8 @@ describe('Blog component', () => {
     expect(url).toBeNull()
     expect(likes).toBeNull()
 
-    const user = userEvent.setup()
     const button = screen.getByText('View')
-    await user.click(button)
+    await userEvent.click(button)
 
     url = screen.queryByText('http://example.com')
     likes = screen.queryByText('Likes: 10')
@@ -56,24 +55,46 @@ describe('Blog component', () => {
 
   test('like button click calls event handler twice', async () => {
     const mockHandler = jest.fn()
-    container = render(
+    render(
       <Blog
         blog={blog}
         handleLike={mockHandler}
         handleDelete={() => {}}
         user={{}} />
-    ).container
+    )
 
-    const user = userEvent.setup()
     const viewButtons = screen.getAllByText('View')
     const viewButton = viewButtons[viewButtons.length - 1]
-    await user.click(viewButton)
+    await userEvent.click(viewButton)
 
     const likeButton = screen.getByText('Like')
 
-    await user.click(likeButton)
-    await user.click(likeButton)
+    await userEvent.click(likeButton)
+    await userEvent.click(likeButton)
 
     expect(mockHandler.mock.calls).toHaveLength(2)
+  })
+
+  test('form calls event handler with correct details when a new blog is created', async () => {
+    const mockHandler = jest.fn()
+
+    render(<BlogForm addBlog={mockHandler} />)
+
+    const titleInput = screen.getByPlaceholderText('type title')
+    const authorInput = screen.getByPlaceholderText('type author')
+    const urlInput = screen.getByPlaceholderText('type url')
+    const createButton = screen.getByText('create')
+
+    await userEvent.type(titleInput, 'New Blog Title')
+    await userEvent.type(authorInput, 'New Blog Author')
+    await userEvent.type(urlInput, 'http://newblog.com')
+
+    await userEvent.click(createButton)
+
+    expect(mockHandler.mock.calls[0][0]).toStrictEqual({
+      title: 'New Blog Title',
+      author: 'New Blog Author',
+      url: 'http://newblog.com'
+    })
   })
 })
